@@ -7,8 +7,15 @@ st.markdown("# Catálogo de Libros 📖")
 
 API_URL = "http://fastapi:8000"
 
+# Búsqueda
+busqueda = st.text_input("🔍 Buscar por título o autor")
+
 try:
-    response = requests.get(f"{API_URL}/libros/")
+    if busqueda:
+        response = requests.get(f"{API_URL}/libros/buscar/", params={"q": busqueda})
+    else:
+        response = requests.get(f"{API_URL}/libros/")
+
     if response.status_code == 200:
         libros = response.json().get("libros", [])
         if libros:
@@ -17,9 +24,9 @@ try:
             df.columns = ["ID", "Título", "Autor", "Disponibilidad"]
             st.dataframe(df, use_container_width=True)
         else:
-            st.warning("No hay libros en el catálogo todavía.")
+            st.warning("No se encontraron libros.")
     else:
-        st.error(f"Error al obtener libros: {response.status_code}")
+        st.error(f"Error: {response.status_code}")
 except Exception as e:
     st.error(f"Error de conexión: {e}")
 

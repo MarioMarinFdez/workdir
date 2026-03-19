@@ -70,3 +70,13 @@ def return_loan_endpoint(loan_id: int, db: Session = Depends(get_db)):
         return {"id": loan.id, "return_date": loan.return_date}
     except LoanNotFoundError:
         raise HTTPException(status_code=404, detail="Préstamo no encontrado")
+
+@app.get("/libros/buscar/")
+def search_books(q: str, db: Session = Depends(get_db)):
+    books = BookRepository.list_all(db)
+    q_lower = q.lower()
+    results = [
+        b for b in books
+        if q_lower in b.title.lower() or q_lower in b.author.lower()
+    ]
+    return {"libros": [{"id": b.id, "title": b.title, "author": b.author, "available": b.available} for b in results]}
