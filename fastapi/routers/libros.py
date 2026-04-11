@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from data.database import get_session
 from data.repositories import BookRepository
 from logger import get_logger
+from decorators import log_execution_time
 
 logger = get_logger(__name__)
 
@@ -16,12 +17,14 @@ def get_db():
         db.close()
 
 @router.get("/")
+@log_execution_time
 def list_books(db: Session = Depends(get_db)):
     logger.info("Listando todos los libros")
     books = BookRepository.list_all(db)
     return {"libros": [{"id": b.id, "title": b.title, "author": b.author, "available": b.available} for b in books]}
 
 @router.post("/")
+@log_execution_time
 def create_book(title: str, author: str, isbn: str = None, db: Session = Depends(get_db)):
     logger.info(f"Creando libro: {title} de {author}")
     book = BookRepository.create(db, title=title, author=author, isbn=isbn)
@@ -29,6 +32,7 @@ def create_book(title: str, author: str, isbn: str = None, db: Session = Depends
     return {"id": book.id, "title": book.title, "author": book.author}
 
 @router.get("/buscar/")
+@log_execution_time
 def search_books(q: str, db: Session = Depends(get_db)):
     logger.info(f"Buscando libros con: {q}")
     books = BookRepository.list_all(db)
