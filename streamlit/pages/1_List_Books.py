@@ -7,26 +7,30 @@ st.markdown("# Catálogo de Libros 📖")
 
 API_URL = "http://fastapi:8000"
 
+@st.cache_data(ttl=30)
+def get_libros():
+    response = requests.get(f"{API_URL}/libros/")
+    if response.status_code == 200:
+        return response.json().get("libros", [])
+    return []
+
 # Búsqueda
 busqueda = st.text_input("🔍 Buscar por título o autor")
 
 try:
     if busqueda:
         response = requests.get(f"{API_URL}/libros/buscar/", params={"q": busqueda})
+        libros = response.json().get("libros", []) if response.status_code == 200 else []
     else:
-        response = requests.get(f"{API_URL}/libros/")
+        libros = get_libros()
 
-    if response.status_code == 200:
-        libros = response.json().get("libros", [])
-        if libros:
-            df = pd.DataFrame(libros)
-            df["available"] = df["available"].map({True: "✅ Disponible", False: "❌ Prestado"})
-            df.columns = ["ID", "Título", "Autor", "Disponibilidad"]
-            st.dataframe(df, use_container_width=True)
-        else:
-            st.warning("No se encontraron libros.")
+    if libros:
+        df = pd.DataFrame(libros)
+        df["available"] = df["available"].map({True: "✅ Disponible", False: "❌ Prestado"})
+        df.columns = ["ID", "Título", "Autor", "Disponibilidad"]
+        st.dataframe(df, use_container_width=True)
     else:
-        st.error(f"Error: {response.status_code}")
+        st.warning("No se encontraron libros.")
 except Exception as e:
     st.error(f"Error de conexión: {e}")
 
@@ -50,6 +54,7 @@ with st.form("add_book_form"):
                 )
                 if response.status_code == 200:
                     st.success(f"Libro '{title}' añadido correctamente.")
+                    st.cache_data.clear()
                     st.rerun()
                 else:
                     st.error("Error al añadir el libro.")
