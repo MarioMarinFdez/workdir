@@ -28,7 +28,7 @@ jobs:
       - name: Ejecutar tests con cobertura
         run: |
           cd fastapi
-          pytest tests/ -v --cov=. --cov-report=term-missing --cov-fail-under=80
+          PYTHONPATH=.. pytest tests/ -v --cov=. --cov-report=term-missing --cov-fail-under=80
 
       - name: Tests Streamlit utils
         run: |
