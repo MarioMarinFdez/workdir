@@ -1,15 +1,15 @@
-FROM tiangolo/uvicorn-gunicorn
+FROM python:3.11-slim
 
-RUN mkdir /fastapi
+WORKDIR /app
 
-COPY requirements.txt /fastapi
-
-WORKDIR /fastapi
-
+COPY fastapi/requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY . /fastapi
+COPY fastapi/ ./fastapi/
+COPY data/ ./data/
+
+ENV PYTHONPATH=/app
 
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]

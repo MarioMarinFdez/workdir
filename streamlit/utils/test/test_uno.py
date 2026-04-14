@@ -1,7 +1,8 @@
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from streamlit.utils.utilidades import *
+from utils.utilidades import conectar
 
-def test_uno():
-    assert conectar () == True
-
-test_uno()
+def test_conectar_devuelve_true():
+    assert conectar() == True

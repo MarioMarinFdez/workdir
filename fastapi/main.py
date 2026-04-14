@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from data.database import Base, engine
-from routers import libros, usuarios, prestamos
+from fastapi.routers import libros, usuarios, prestamos
 
 Base.metadata.create_all(bind=engine)
 

@@ -3,3 +3,6 @@ uvicorn
 sqlalchemy
 pandas
 pydantic
+httpx
+pytest
+pytest-cov
