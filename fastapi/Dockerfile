@@ -6,7 +6,6 @@ COPY fastapi/requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY fastapi/ ./fastapi/
-COPY data/ ./data/
 
 ENV PYTHONPATH=/app
 

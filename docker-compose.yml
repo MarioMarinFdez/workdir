@@ -1,5 +1,3 @@
-## NECESITAIS UN BIND MOUNT!
-
 version: '3.8'
 
 services:
@@ -14,7 +12,8 @@ services:
       - deploy_network
     container_name: fastapi
     volumes:
-      - db_data:/app/data
+      - ./data:/app/data
+      - db_data:/app/data/db
 
   streamlit:
     build:
