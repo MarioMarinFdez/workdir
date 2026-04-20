@@ -41,3 +41,18 @@ def search_books(q: str, db: Session = Depends(get_db)):
     if not results:
         logger.warning(f"No se encontraron libros para: {q}")
     return {"libros": [{"id": b.id, "title": b.title, "author": b.author, "available": b.available} for b in results]}
+
+@router.get("/disponibles/")
+@log_execution_time
+def list_available_books(db: Session = Depends(get_db)):
+    """
+    Endpoint que usa un generador para procesar libros disponibles
+    de forma eficiente sin cargar todos en memoria a la vez.
+    """
+    logger.info("Listando libros disponibles con generador")
+    # Usamos el generador: yield_per procesa 50 registros a la vez
+    resultado = [
+        {"id": b.id, "title": b.title, "author": b.author}
+        for b in BookRepository.iter_available(db)
+    ]
+    return {"libros": resultado, "total": len(resultado)}

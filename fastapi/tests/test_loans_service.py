@@ -12,7 +12,6 @@ from data.loans_service import (
     LoanNotFoundError,
 )
 
-# Base de datos en memoria para tests
 engine = create_engine("sqlite:///:memory:")
 TestSession = sessionmaker(bind=engine)
 
@@ -63,3 +62,24 @@ def test_devolver_prestamo(db, usuario, libro):
 def test_error_devolver_prestamo_no_existe(db):
     with pytest.raises(LoanNotFoundError):
         return_loan(db, loan_id=999)
+
+def test_generador_libros_disponibles(db):
+    """Verifica que iter_available genera solo libros disponibles."""
+    BookRepository.create(db, title="Libro A", author="Autor A")
+    BookRepository.create(db, title="Libro B", author="Autor B")
+    b3 = BookRepository.create(db, title="Libro C", author="Autor C")
+    b3.available = False
+    db.flush()
+
+    disponibles = list(BookRepository.iter_available(db))
+    assert len(disponibles) == 2
+    assert all(b.available for b in disponibles)
+
+def test_generador_prestamos_activos(db, usuario, libro):
+    """Verifica que iter_active genera solo préstamos sin devolver."""
+    loan = create_loan(db, user_id=usuario.id, book_id=libro.id)
+    db.flush()
+
+    activos = list(LoanRepository.iter_active(db))
+    assert len(activos) == 1
+    assert activos[0].id == loan.id

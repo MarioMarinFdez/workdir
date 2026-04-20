@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Generator
 
 from sqlalchemy.orm import Session
 
@@ -13,6 +13,20 @@ class BookRepository:
     @staticmethod
     def list_all(session: Session) -> List[Book]:
         return session.query(Book).all()
+
+    @staticmethod
+    def iter_available(session: Session) -> Generator[Book, None, None]:
+        """Generador que yields libros disponibles uno a uno, sin cargar todos en memoria."""
+        query = session.query(Book).filter(Book.available == True).yield_per(50)
+        for book in query:
+            yield book
+
+    @staticmethod
+    def iter_all(session: Session) -> Generator[Book, None, None]:
+        """Generador que yields todos los libros uno a uno."""
+        query = session.query(Book).yield_per(50)
+        for book in query:
+            yield book
 
     @staticmethod
     def create(
@@ -64,6 +78,13 @@ class LoanRepository:
     @staticmethod
     def list_active(session: Session) -> List[Loan]:
         return session.query(Loan).filter(Loan.return_date.is_(None)).all()
+
+    @staticmethod
+    def iter_active(session: Session) -> Generator[Loan, None, None]:
+        """Generador que yields préstamos activos uno a uno."""
+        query = session.query(Loan).filter(Loan.return_date.is_(None)).yield_per(50)
+        for loan in query:
+            yield loan
 
     @staticmethod
     def create(
