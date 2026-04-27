@@ -1,0 +1,7 @@
+[run]
+omit =
+    fastapi/server.py
+    data/migrate_books_from_csv.py
+    data/create_tables.py
+    data/test_domain.py
+    */tests/*
