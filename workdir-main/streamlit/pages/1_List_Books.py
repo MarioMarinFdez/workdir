@@ -27,7 +27,7 @@ try:
     if libros:
         df = pd.DataFrame(libros)
         df["available"] = df["available"].map({True: "✅ Disponible", False: "❌ Prestado"})
-        df.columns = ["ID", "Título", "Autor", "Disponibilidad"]
+        df.columns = ["ID", "Título", "Autor", "Género", "Disponibilidad"]
         st.dataframe(df, use_container_width=True)
     else:
         st.warning("No se encontraron libros.")
@@ -40,17 +40,18 @@ st.markdown("## Añadir nuevo libro")
 with st.form("add_book_form"):
     title = st.text_input("Título")
     author = st.text_input("Autor")
+    genre = st.text_input("Género")
     isbn = st.text_input("ISBN (opcional)")
     submitted = st.form_submit_button("Añadir libro")
 
     if submitted:
-        if not title or not author:
-            st.error("El título y el autor son obligatorios.")
+        if not title or not author or not genre:
+            st.error("El título, el autor y el género son obligatorios.")
         else:
             try:
                 response = requests.post(
                     f"{API_URL}/libros/",
-                    params={"title": title, "author": author, "isbn": isbn or None}
+                    params={"title": title, "author": author, "genre": genre, "isbn": isbn or None}
                 )
                 if response.status_code == 200:
                     st.success(f"Libro '{title}' añadido correctamente.")

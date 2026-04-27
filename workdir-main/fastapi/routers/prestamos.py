@@ -35,6 +35,12 @@ def create_loan_endpoint(user_id: int, book_id: int, db: Session = Depends(get_d
 def return_loan_endpoint(loan_id: int, db: Session = Depends(get_db)):
     logger.info(f"Devolviendo prestamo: {loan_id}")
     try:
+        loan = db.query(Loan).filter(Loan.id == loan_id).first()
+        if loan is None:
+            raise LoanNotFoundError()
+        if loan.return_date is not None:
+            logger.warning(f"Prestamo {loan_id} ya estaba devuelto")
+            raise HTTPException(status_code=400, detail="Este préstamo ya fue devuelto")
         loan = return_loan(db, loan_id=loan_id)
         db.commit()
         return {"id": loan.id, "return_date": loan.return_date}
