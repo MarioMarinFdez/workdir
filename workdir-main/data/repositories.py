@@ -33,9 +33,10 @@ class BookRepository:
         session: Session,
         title: str,
         author: str,
+        genre: str | None = None,
         isbn: str | None = None,
     ) -> Book:
-        book = Book(title=title, author=author, isbn=isbn, available=True)
+        book = Book(title=title, author=author, genre=genre, isbn=isbn, available=True)
         session.add(book)
         session.flush()
         return book
@@ -85,15 +86,7 @@ class LoanRepository:
         query = session.query(Loan).filter(Loan.return_date.is_(None)).yield_per(50)
         for loan in query:
             yield loan
-    
-    @staticmethod
-    def get_loans_by_user(session: Session, user_id: int) -> List[Loan]:
-        return (
-            session.query(Loan)
-            .filter(Loan.user_id == user_id)
-            .order_by(Loan.loan_date.desc())
-            .all()
-        )
+
     @staticmethod
     def create(
         session: Session,

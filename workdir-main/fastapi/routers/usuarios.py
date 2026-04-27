@@ -1,19 +1,12 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from data.database import get_session
+from dependencies import get_db
 from data.repositories import UserRepository
 from logger import get_logger
 
 logger = get_logger(__name__)
 
 router = APIRouter(prefix="/usuarios", tags=["usuarios"])
-
-def get_db():
-    db = get_session()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @router.get("/")
 def list_users(db: Session = Depends(get_db)):
