@@ -11,4 +11,6 @@ ENV PYTHONPATH=/app
 
 EXPOSE 8000
 
-CMD ["uvicorn", "fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
+WORKDIR /app/fastapi
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
